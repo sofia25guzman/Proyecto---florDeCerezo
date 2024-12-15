@@ -1,70 +1,82 @@
-// Inicializamos las variables
 
+// Inicializamos las variables
 let email = " ";
 let confirmEmail = " ";
 let nombre = " ";
 let apellido = " ";
-let producto = " ";
-let cantidad = 0;
 let cantidadTotal = 0;
-let precio = 0;
 let precioTotal = 0;
 let seguirComprando = true;
 
-alert("¡Bienvenido a Flor de cerezo! necesitaremos unos datos antes de continuar:");
+// Array de productos disponibles
+const productosDisponibles = [
+    { nombre: "vestidos", precio: 20000 },
+    { nombre: "pantalones", precio: 40000 },
+    { nombre: "zapatos", precio: 60000 },
+    { nombre: "carteras", precio: 20000 }
+];
 
-
-email = prompt("Ingreso su Email: ");
-confirmEmail = prompt("confirme su Email: ");
-    if (email == confirmEmail) {
-        alert("El Email ingresado es"+" "+email);
-    }else{
-        alert("Los Email no coinciden")
-        email = prompt("Ingreso su Email: ");
-        confirmEmail = prompt("confirme su Email: ");
+// Clase constructora Producto
+class Producto {
+    constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio;
     }
+
+    calcularPrecio(cantidad) {
+        return this.precio * cantidad;
+    }
+}
+
+alert("¡Bienvenido a Flor de cerezo! Necesitaremos unos datos antes de continuar:");
+
+email = prompt("Ingrese su Email: ");
+confirmEmail = prompt("Confirme su Email: ");
+if (email === confirmEmail) {
+    alert("El Email ingresado es: " + email);
+} else {
+    alert("Los Emails no coinciden. Intente de nuevo.");
+    email = prompt("Ingrese su Email: ");
+    confirmEmail = prompt("Confirme su Email: ");
+}
+
 nombre = prompt("Ingrese su nombre: ");
 apellido = prompt("Ingrese su apellido: ");
-    alert("Gracias por registrase en nuestra página"+ " "+nombre+" "+apellido);
+alert("Gracias por registrarse en nuestra página, " + nombre + " " + apellido);
 
-    function calcularPrecio(producto, cantidad) {
-        let precio;
-        switch (producto) {
-            case "vestidos":
-                precio = 20000;
-                break;
-            case "pantalones":
-                precio = 40000;
-                break;
-            case "zapatos":
-                precio = 60000;
-                break;
-            case "carteras":
-                precio = 20000;
-                break;
-            default:
-                alert("Producto fuera de catálogo");
-                return 0; 
-        }
-        return precio * cantidad; 
+// Función para calcular el precio total, usando una función de orden superior
+function calcularPrecioTotal(productos, fn) {
+    return productos.reduce(fn, 0);  
+}
+
+do {
+    let productoElegido = prompt("Elija un producto: vestidos, pantalones, zapatos, carteras").toLowerCase();
+    let cantidad = parseInt(prompt("¿Cuántos productos desea comprar?"));
+
+
+    const producto = productosDisponibles.find(p => p.nombre === productoElegido);
+    
+    if (producto) {
+        const nuevoProducto = new Producto(producto.nombre, producto.precio);
+        let totalProducto = nuevoProducto.calcularPrecio(cantidad);
+
+
+        precioTotal += totalProducto;
+        cantidadTotal += cantidad;
+    } else {
+        alert("Producto no encontrado o fuera de catálogo.");
     }
-    
-    do {
-        let producto = prompt("Elija un producto: vestidos, pantalones, zapatos, carteras").toLowerCase();
-        let cantidad = parseInt(prompt("¿Cuántos productos desea comprar?"));
-    
-        let totalProducto = calcularPrecio(producto, cantidad); 
-    
-        if (totalProducto > 0) {
-            precioTotal += totalProducto; 
-            cantidadTotal += cantidad; 
-        }
-    
-        seguirComprando = confirm("¿Desea seguir comprando?");
-    } while (seguirComprando);
-    
-    alert("La cantidad de productos es: " + cantidadTotal + " y el precio total es: " + precioTotal);
-    alert("Gracias por comprar en Flor de cerezo");
-    
+
+    seguirComprando = confirm("¿Desea seguir comprando?");
+} while (seguirComprando);
+
+// Si el cliente comprá más de 30mil en productos, ofrece al cliente envío gratis
+const productosCaros = productosDisponibles.filter(p => p.precio > 30000);
+
+alert("Productos con precio superior a 30.000, ¡¡tienes envío gratis!! ");
+
+//Mensaje final de compra
+alert("La cantidad de productos es: " + cantidadTotal + " y el precio total es: " + precioTotal);
+alert("Gracias por comprar en Flor de cerezo");
 
 
