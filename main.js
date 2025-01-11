@@ -1,82 +1,96 @@
 
-// Inicializamos las variables
-let email = " ";
-let confirmEmail = " ";
-let nombre = " ";
-let apellido = " ";
-let cantidadTotal = 0;
-let precioTotal = 0;
-let seguirComprando = true;
+const tablaCarrito = document.getElementById('tablaCarrito');
+const totalCarrito = document.getElementById('total');
+const btnProcederPago = document.getElementById('btnProcederPago');
 
-// Array de productos disponibles
-const productosDisponibles = [
-    { nombre: "vestidos", precio: 20000 },
-    { nombre: "pantalones", precio: 40000 },
-    { nombre: "zapatos", precio: 60000 },
-    { nombre: "carteras", precio: 20000 }
-];
+function actualizarTotal() {
+    let totalCompra = 0;
 
-// Clase constructora Producto
-class Producto {
-    constructor(nombre, precio) {
-        this.nombre = nombre;
-        this.precio = precio;
+    const filas = tablaCarrito.getElementsByTagName('tr');
+
+    for (let fila of filas) {
+        const cantidadInput = fila.querySelector('.cantidad');
+        const precioElemento = fila.querySelector('.precio');
+        
+
+        if (!cantidadInput || !precioElemento) {
+            continue; 
+        }
+
+        const cantidad = parseInt(cantidadInput.value);
+        const precio = parseInt(precioElemento.textContent);
+        
+        if (isNaN(cantidad) || isNaN(precio)) {
+            continue; 
+        }
+
+        // Calcular el total del producto (cantidad * precio)
+        const totalProducto = cantidad * precio;
+        
+        const totalElemento = fila.querySelector('.total');
+        if (totalElemento) {
+            totalElemento.textContent = `$${totalProducto}`;
+        }
+
+        totalCompra += totalProducto;
     }
-
-    calcularPrecio(cantidad) {
-        return this.precio * cantidad;
-    }
-}
-
-alert("¡Bienvenido a Flor de cerezo! Necesitaremos unos datos antes de continuar:");
-
-email = prompt("Ingrese su Email: ");
-confirmEmail = prompt("Confirme su Email: ");
-if (email === confirmEmail) {
-    alert("El Email ingresado es: " + email);
-} else {
-    alert("Los Emails no coinciden. Intente de nuevo.");
-    email = prompt("Ingrese su Email: ");
-    confirmEmail = prompt("Confirme su Email: ");
-}
-
-nombre = prompt("Ingrese su nombre: ");
-apellido = prompt("Ingrese su apellido: ");
-alert("Gracias por registrarse en nuestra página, " + nombre + " " + apellido);
-
-// Función para calcular el precio total, usando una función de orden superior
-function calcularPrecioTotal(productos, fn) {
-    return productos.reduce(fn, 0);  
-}
-
-do {
-    let productoElegido = prompt("Elija un producto: vestidos, pantalones, zapatos, carteras").toLowerCase();
-    let cantidad = parseInt(prompt("¿Cuántos productos desea comprar?"));
-
-
-    const producto = productosDisponibles.find(p => p.nombre === productoElegido);
     
-    if (producto) {
-        const nuevoProducto = new Producto(producto.nombre, producto.precio);
-        let totalProducto = nuevoProducto.calcularPrecio(cantidad);
 
+    totalCarrito.textContent = `$${totalCompra.toFixed(2)}`;
+}
 
-        precioTotal += totalProducto;
-        cantidadTotal += cantidad;
-    } else {
-        alert("Producto no encontrado o fuera de catálogo.");
+function eliminarProducto(event) {
+    if (event.target.classList.contains('btn-danger')) {
+        const fila = event.target.closest('tr');
+        fila.remove();
+        actualizarTotal();
+    }
+}
+
+// Evento de cambio de cantidad
+tablaCarrito.addEventListener('input', function(event) {
+    if (event.target.classList.contains('cantidad')) {
+        actualizarTotal();
+    }
+});
+
+// Evento para eliminar productos
+tablaCarrito.addEventListener('click', eliminarProducto);
+
+// Evento para proceder al pago
+btnProcederPago.addEventListener('click', function() {
+
+    actualizarTotal();
+
+    let email = prompt("Ingrese su Email: ");
+    if (email === null) return; 
+
+    let confirmEmail = prompt("Confirme su Email: ");
+    if (confirmEmail === null) return; 
+    
+    if (email !== confirmEmail) {
+        alert("Los correos electrónicos no coinciden.");
+        return;
     }
 
-    seguirComprando = confirm("¿Desea seguir comprando?");
-} while (seguirComprando);
+    let nombre = prompt("Ingrese su nombre: ");
+    if (nombre === null) return; 
 
-// Si el cliente comprá más de 30mil en productos, ofrece al cliente envío gratis
-const productosCaros = productosDisponibles.filter(p => p.precio > 30000);
+    let apellido = prompt("Ingrese su apellido: ");
+    if (apellido === null) return;
+    
+    // Mostrar los datos del cliente en el DOM
+    const datosCliente = document.createElement('div');
+    datosCliente.innerHTML = `
+        <h4>Resumen de tu compra</h4>
+        <p>Email: ${email}</p>
+        <p>Nombre: ${nombre} ${apellido}</p>
+        <p>Total de la compra: ${totalCarrito.textContent}</p>
+    `;
+    document.body.appendChild(datosCliente);
 
-alert("Productos con precio superior a 30.000, ¡¡tienes envío gratis!! ");
+    alert("¡Gracias por tu compra!");
+});
 
-//Mensaje final de compra
-alert("La cantidad de productos es: " + cantidadTotal + " y el precio total es: " + precioTotal);
-alert("Gracias por comprar en Flor de cerezo");
 
 
