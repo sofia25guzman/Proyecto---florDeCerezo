@@ -1,4 +1,4 @@
-
+//Inicializacion de variables
 let productos = [
     { nombre: 'vestidos', precio: 20000, cantidad: 1 },
     { nombre: 'pantalones', precio: 40000, cantidad: 1 },
